@@ -12,6 +12,7 @@
   const MAX_STONES = 24;
   const MAX_RIPPLES = 140;
   const STORE_KEY = 'oto-no-ike-v1';
+  const SETTINGS_KEY = 'oto-no-ike-settings-v1';
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -36,6 +37,7 @@
 
   // ---------- 音 ----------
   let ac = null, master = null, bus = null, voices = 0, muted = false;
+  let dropSound = true; // 水音（しずく・雨粒・石を沈めたときの「ぽつ」）を鳴らすか
 
   function makeImpulse(seconds) {
     const rate = ac.sampleRate, len = Math.floor(rate * seconds);
@@ -73,7 +75,8 @@
   function panNode(pan) {
     if (ac.createStereoPanner) {
       const p = ac.createStereoPanner();
-      p.pan.value = Math.max(-1, Math.min(1, pan));
+      // 画面幅が 0 のときなどに NaN になっても例外で止まらないよう、数値でなければ中央にする
+      p.pan.value = Number.isFinite(pan) ? Math.max(-1, Math.min(1, pan)) : 0;
       return p;
     }
     return ac.createGain();
@@ -104,9 +107,9 @@
     });
   }
 
-  // しずくの音：短く下がる「ぽつ」
+  // しずくの音：短く下がる「ぽつ」。水音オフのときは鳴らさない
   function plip(pan, vol) {
-    if (!ac) return;
+    if (!ac || !dropSound) return;
     const t = ac.currentTime + 0.005;
     const o = ac.createOscillator(); o.type = 'sine';
     o.frequency.setValueAtTime(1500 + Math.random() * 300, t);
@@ -124,6 +127,22 @@
     muted = v;
     muteBtn.setAttribute('aria-pressed', String(v));
     if (master) master.gain.setTargetAtTime(v ? 0 : 0.85, ac.currentTime, 0.05);
+  }
+
+  // 水音のオン・オフ。ボタンは「消音」と同じく、押されているときがオフ。設定はブラウザに保存する
+  function setDropSound(on) {
+    dropSound = on;
+    dropSoundBtn.setAttribute('aria-pressed', String(!on));
+    try {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify({ dropSound: on }));
+    } catch (_) { /* 保存できない環境では何もしない */ }
+  }
+  function loadSettings() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || 'null');
+      if (saved && typeof saved.dropSound === 'boolean') dropSound = saved.dropSound;
+    } catch (_) { /* 読めなければ初期値のまま */ }
+    dropSoundBtn.setAttribute('aria-pressed', String(!dropSound));
   }
 
   // ---------- 画面 ----------
@@ -277,8 +296,19 @@
   const toastEl = document.getElementById('toast');
   const rainBtn = document.getElementById('rain');
   const muteBtn = document.getElementById('mute');
+  const dropSoundBtn = document.getElementById('drop-sound');
   const resetBtn = document.getElementById('reset');
   const modeBtns = Array.from(document.querySelectorAll('[data-mode]'));
+  const trayEl = document.querySelector('.tray');
+
+  // 道具バーの上端から画面の下までの高さを測り、案内文と通知をその上に出す（CSS の --tray-space）
+  function measureTray() {
+    const space = Math.ceil(window.innerHeight - trayEl.getBoundingClientRect().top);
+    document.documentElement.style.setProperty('--tray-space', space + 'px');
+  }
+  if ('ResizeObserver' in window) new ResizeObserver(measureTray).observe(trayEl);
+  window.addEventListener('resize', measureTray);
+  measureTray();
 
   function dismissHint() {
     if (!hintShown) return;
@@ -287,6 +317,7 @@
   }
   let toastTimer = 0;
   function toast(msg) {
+    dismissHint(); // 案内文と通知が重ならないよう、通知を出すときは案内文を消す
     toastEl.textContent = msg;
     toastEl.classList.add('show');
     clearTimeout(toastTimer);
@@ -306,6 +337,7 @@
   modeBtns.forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
   rainBtn.addEventListener('click', () => { ensureAudio(); dismissHint(); setRain(!raining); });
   muteBtn.addEventListener('click', () => setMuted(!muted));
+  dropSoundBtn.addEventListener('click', () => setDropSound(!dropSound));
   resetBtn.addEventListener('click', () => {
     stones = defaultStones();
     layoutStones();
@@ -398,6 +430,7 @@
     else if (k === '3') setMode('remove');
     else if (k === 'r') { ensureAudio(); dismissHint(); setRain(!raining); }
     else if (k === 'm') setMuted(!muted);
+    else if (k === 'w') setDropSound(!dropSound);
     else if (k === ' ' && !onButton) {
       e.preventDefault();
       ensureAudio(); dismissHint();
@@ -601,6 +634,7 @@
 
   // ---------- 開始 ----------
   resize();
+  loadSettings();
   stones = load() || defaultStones();
   layoutStones();
 

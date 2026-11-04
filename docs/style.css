@@ -43,9 +43,14 @@ canvas.removing { cursor: pointer; }
   color: var(--ink-soft);
 }
 
+/* 案内文。石の上に重なっても読めるよう、薄い水色の下地を敷く */
 .hint {
-  position: fixed; left: 50%; top: 18%;
-  transform: translateX(-50%);
+  position: fixed; left: 16px; right: 16px; top: 18%;
+  width: fit-content; margin: 0 auto;
+  padding: 12px 22px;
+  background: rgba(220, 232, 228, .78);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  border-radius: 18px;
   text-align: center;
   font-family: var(--mincho);
   pointer-events: none; user-select: none;
@@ -78,11 +83,13 @@ canvas.removing { cursor: pointer; }
 .tray button:hover { background: rgba(34, 48, 58, .08); }
 .tray button[aria-pressed="true"] { background: var(--ink); color: var(--water); }
 .tray button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.tray .group { display: flex; align-items: center; gap: 2px; }
 .tray .sep { width: 1px; height: 18px; background: rgba(34, 48, 58, .2); margin: 0 5px; }
 
+/* --tray-space は app.js が測る「道具バーの上端から画面の下まで」の高さ */
 .toast {
   position: fixed; left: 50%;
-  bottom: calc(76px + env(safe-area-inset-bottom));
+  bottom: calc(var(--tray-space, 64px) + 12px);
   transform: translateX(-50%);
   font-size: 13px; letter-spacing: .05em;
   color: var(--ink-soft);
@@ -91,15 +98,11 @@ canvas.removing { cursor: pointer; }
 }
 .toast.show { opacity: 1; }
 
+/* スマホ幅: 道具バーを「道具」と「設定」の 2 段にし、案内文はその上に出す */
 @media (max-width: 600px) {
-  .hint {
-    top: auto; bottom: calc(84px + env(safe-area-inset-bottom));
-    width: calc(100vw - 32px);
-  }
-}
-@media (max-width: 420px) {
-  .tray button { font-size: 13px; padding: 8px 9px; }
-  .tray .sep { margin: 0 2px; }
+  .tray { flex-direction: column; gap: 0; padding: 5px 6px; border-radius: 22px; }
+  .tray .sep { width: auto; height: 1px; align-self: stretch; margin: 3px 12px; }
+  .hint { top: auto; bottom: calc(var(--tray-space, 120px) + 16px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .hint, .toast { transition: none; }

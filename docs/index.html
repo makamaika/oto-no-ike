@@ -26,14 +26,19 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<nav class="tray" aria-label="道具">
-  <button type="button" data-mode="drop" aria-pressed="true" title="水面にしずくを落とす（1）">しずく</button>
-  <button type="button" data-mode="stone" aria-pressed="false" title="水面に石を置く（2）">石を置く</button>
-  <button type="button" data-mode="remove" aria-pressed="false" title="石をクリックして取り除く（3）">石を取る</button>
+<nav class="tray" aria-label="操作">
+  <div class="group" role="group" aria-label="道具">
+    <button type="button" data-mode="drop" aria-pressed="true" title="水面にしずくを落とす（1）">しずく</button>
+    <button type="button" data-mode="stone" aria-pressed="false" title="水面に石を置く（2）">石を置く</button>
+    <button type="button" data-mode="remove" aria-pressed="false" title="石をクリックして取り除く（3）">石を取る</button>
+  </div>
   <span class="sep" aria-hidden="true"></span>
-  <button type="button" id="rain" aria-pressed="false" title="ときどき雨粒が落ちる（R）">雨</button>
-  <button type="button" id="mute" aria-pressed="false" title="音を消す（M）">消音</button>
-  <button type="button" id="reset" title="石を最初の並びに戻す">初期配置</button>
+  <div class="group" role="group" aria-label="設定">
+    <button type="button" id="rain" aria-pressed="false" title="ときどき雨粒が落ちる（R）">雨</button>
+    <button type="button" id="drop-sound" aria-pressed="false" title="しずくが落ちる水音を消す。石の音は鳴ります（W）">水音オフ</button>
+    <button type="button" id="mute" aria-pressed="false" title="すべての音を消す（M）">消音</button>
+    <button type="button" id="reset" title="石を最初の並びに戻す">初期配置</button>
+  </div>
 </nav>
 </body>
 </html>
