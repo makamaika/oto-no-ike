@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="しずくを落とすと波紋が広がり、波紋が当たった石が鳴る、ブラウザで遊べる音のおもちゃ。">
+<title>音の池</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+<canvas id="pond" aria-label="池。水面をクリックするとしずくが落ち、波紋が石に当たると音が鳴ります。スペースキーでも、しずくを落とせます。"></canvas>
+
+<div class="title">
+  <h1>音の池</h1>
+  <p>しずくを落とすと<br>波紋が石を鳴らします</p>
+</div>
+
+<div class="hint" id="hint">
+  <p><span>水面に触れると、</span><span>音が出ます</span></p>
+  <p class="sub"><span>石は引きずって動かせます。</span><span>上に置くほど高い音になります</span></p>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<nav class="tray" aria-label="道具">
+  <button type="button" data-mode="drop" aria-pressed="true" title="水面にしずくを落とす（1）">しずく</button>
+  <button type="button" data-mode="stone" aria-pressed="false" title="水面に石を置く（2）">石を置く</button>
+  <button type="button" data-mode="remove" aria-pressed="false" title="石をクリックして取り除く（3）">石を取る</button>
+  <span class="sep" aria-hidden="true"></span>
+  <button type="button" id="rain" aria-pressed="false" title="ときどき雨粒が落ちる（R）">雨</button>
+  <button type="button" id="mute" aria-pressed="false" title="音を消す（M）">消音</button>
+  <button type="button" id="reset" title="石を最初の並びに戻す">初期配置</button>
+</nav>
+</body>
+</html>

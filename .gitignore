@@ -1,0 +1,29 @@
+# 秘密情報
+.env
+.env.*
+!.env.example
+
+# 依存パッケージ・ビルド成果物（今は使っていないが、追加したときのため）
+node_modules/
+dist/
+build/
+
+# DB ファイル
+*.db
+*.sqlite
+*.sqlite3
+
+# ログ・一時ファイル
+*.log
+tmp/
+
+# OS・エディター
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.vscode/
+.idea/
+
+# Claude Code のローカル設定
+.claude/
