@@ -49,3 +49,31 @@ default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; base-ur
 - 影響するのは、このフォルダーと GitHub の `makamaika/oto-no-ike` だけ。ほかのプロジェクトや PC 全体の設定は変えない
 - 公開をやめるとき: `gh api -X DELETE repos/makamaika/oto-no-ike/pages` で Pages を無効にする。リポジトリごと消すときは GitHub のリポジトリ設定から削除する
 - ローカルの変更は git で戻せる
+
+## 結果（2026-11-05）
+
+### 実施内容
+- `git init -b main`。作者情報はリポジトリだけに設定した（`makamaika` / GitHub の非公開用アドレス）。PC 全体の git 設定は変えていない
+- `index.html` を `docs/index.html`・`docs/style.css`・`docs/app.js` に分け、CSP の meta タグ、`favicon.svg`、`.nojekyll` を追加した
+- 確認中に見つけた点を 1 つ直した。石の連打防止（80ms）の時刻比較を絶対値にした。確認用の `simulate()` で時刻が先に進むと、石をタップしても鳴らなくなっていたため
+- README、`.gitignore`、`.gitattributes` を追加した
+- 初回コミット `4d5969c` を作り、公開リポジトリ https://github.com/makamaika/oto-no-ike を作ってプッシュした
+- Pages を有効にした（main ブランチの `/docs`、build_type は legacy、HTTPS は強制）
+
+### 検証結果
+- ローカル（127.0.0.1 の一時サーバー。確認後に停止）
+  - CSP が効き、インラインスクリプトはブロックされた
+  - 自分のサイトの CSS・JS・ファビコンは読み込まれた
+  - しずくの連鎖（1 滴で約 30 回鳴る）、石のドラッグで音が変わる、石の追加・削除・タップ、雨・消音・初期配置、保存が動いた
+- 公開後
+  - Pages のビルド（pages build and deployment）は成功した
+  - https://makamaika.github.io/oto-no-ike/ で同じ操作が動き、コンソールのエラーは 0 件だった
+  - `favicon.svg` は 200 だった。`README.md`・計画ファイル・`.gitignore` は 404 で、サイトとしては配信されていない
+
+### 残課題・メモ
+- 音そのものは耳で確認していない（自動の確認では鳴った回数だけを数えた）
+- ウィンドウのサイズを変えると、Canvas の `getImageData` について性能の警告がコンソールに出ることがある（エラーではない）
+- 動作確認用の `window.__pond` を残している。不要なら `docs/app.js` の末尾から削除できる
+- ライセンスはまだ付けていない
+- プロジェクト用の AGENTS.md はまだない
+- 内蔵ブラウザのプレビュー（`preview_start`）が移動前のフォルダーの設定を読んだため、ローカルの確認は自分で起動した一時サーバーで行った。そのとき作った `.claude/launch.json` は削除した
